@@ -1,0 +1,37 @@
+@property --fold {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+.folded-map {
+  --fold: .6; /* between 0 and 1; */
+  width: 75vmin;
+  display: grid;
+  perspective: 800px;
+  transition: --fold 1s linear;
+  &:hover{ --fold: 0deg }
+  
+  :is(*) { transform-style: preserve-3d }
+  :is(img, .fold) { grid-area: 1/1 }
+  :is(img) { width: 100%; visibility: hidden }
+  :is(.fold, .fold > *) { display: grid; grid-auto-flow: column }
+  :is(.fold) { --angle: calc(90deg * var(--fold)); rotate: 1 0 0 var(--angle) }
+  :is(.left) { transform-origin: right; rotate: 0 1 0 calc(var(--angle) * 1); --am: -2 }
+  :is(.right) { transform-origin: left; rotate: 0 1 0 calc(var(--angle) * -1); --am: 2 }
+  :is(.out) { rotate: 0 1 0 calc(var(--angle) * var(--am)) }
+  :is(.left > .out){ --bp: -0%; --op: .5 }
+  :is(.left > .in){ --bp: -100%; --op: .125 }
+  :is(.right > .in){ --bp: -200%; --op: .5 }
+  :is(.right > .out){ --bp: -300%; --op: 0 }
+  :is(.in, .out) { 
+    transform-origin: inherit; 
+    background: 
+      linear-gradient(hsl(0 0% 0% / calc(var(--fold) * var(--op))) 0 0), 
+      var(--bg) var(--bp) / 400%;
+  }
+}
+
+html, body { height: 100% }
+body { margin: 0; display: grid; place-items: center; background-color: #ffffff}
+[data-preview=true] .folded-map { animation: preview 1.5s linear alternate infinite }
+@keyframes preview { from { --fold: .6 } to { --fold: 0 } }
